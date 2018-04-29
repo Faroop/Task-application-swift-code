@@ -1,0 +1,74 @@
+import UIKit
+
+var taskMgr: TaskManager = TaskManager()
+
+struct task {
+    var name = "Name"
+    var desc = "Description"
+}
+
+class TaskManager: NSObject {
+    var tasks = [task]()
+
+    func addTask(name: String, desc: String){
+        tasks.append(task(name: name, desc: desc))
+    }
+}
+
+class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDataSource
+@IBOutlet var tblTasks : UITableView!
+
+override func viewDidLoad() {
+    super.viewDidLoad()
+    tblTasks.reloadData()
+}
+func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int{
+    return taskMgr.tasks.count
+}
+
+func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell{
+    let cell: UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "Default Tasks")
+
+    cell.textLabel?.text = taskMgr.tasks[indexPath.row].name
+    cell.detailTextLabel?.text = taskMgr.tasks[indexPath.row].desc
+
+    return cell
+}
+
+func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath){
+    if (editingStyle == UITableViewCellEditingStyle.Delete){
+
+        taskMgr.tasks.removeAtIndex(indexPath.row)
+        tblTasks.reloadData()
+    }
+}
+
+class SecondViewController: UIViewController, UITextFieldDelegate
+@IBOutlet var txtTask: UITextField!
+@IBOutlet var txtDesc: UITextField!
+
+@IBAction func btnAddTask(sender : UIButton){
+    if (txtTask.text == ""){
+        //Task Title is blank, do not add a record
+    } else {
+    //add record
+    taskMgr.addTask(txtTask.text, desc: txtDesc.text)
+
+    //dismiss keyboard and reset fields
+
+    self.view.endEditing(true)
+    txtTask.text = nil
+    txtDesc.text = nil
+
+    }
+}
+
+override func touchesBegan(touches: NSSet, withEvent event: UIEvent) {
+    self.view.endEditing(true)
+}
+
+func textFieldShouldReturn(textField: UITextField) -> Bool{
+    textField.resignFirstResponder()
+    return true
+}
+
